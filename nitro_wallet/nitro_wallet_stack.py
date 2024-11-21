@@ -160,7 +160,7 @@ class NitroWalletStack(Stack):
             "__REGION__": self.region,
         }
 
-        with open("./user_data/user_data.sh") as f:
+        with open("./application/{}/user_data/user_data.sh".format(application_type)) as f:
             user_data_raw = Fn.sub(f.read(), mappings)
 
         signing_enclave_image.repository.grant_pull(role)
@@ -177,7 +177,7 @@ class NitroWalletStack(Stack):
             block_devices=[block_device],
             role=role,
             security_group=nitro_instance_sg,
-
+            http_put_response_hop_limit=3
         )
 
         nitro_nlb = aws_elasticloadbalancingv2.NetworkLoadBalancer(
@@ -223,7 +223,7 @@ class NitroWalletStack(Stack):
             self,
             "NitroInvokeLambda",
             code=aws_lambda.Code.from_asset(
-                path="lambda_/{}/NitroInvoke".format(params["application_type"])
+                path="application/{}/lambda".format(params["application_type"])
             ),
             handler="lambda_function.lambda_handler",
             runtime=aws_lambda.Runtime.PYTHON_3_11,
